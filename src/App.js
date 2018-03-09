@@ -1,7 +1,7 @@
 import React from 'react'
 import * as BooksAPI from './BooksAPI'
 import {Route} from 'react-router-dom'
-
+import Select from './select'
 import './App.css'
 import BookShelf from "./bookShelf";
 
@@ -17,8 +17,13 @@ class BooksApp extends React.Component {
       this.setState({books})
     })
   }
-  bookQuery = () => {
-    this.setState({searchingBooks:BooksAPI.search(this.state.query)})
+  bookQuery = (e) => {
+    if(e.target.value) {
+      this.setState({query:e.target.value})
+      BooksAPI.search(this.state.query).then(searchingBooks => {
+        this.setState({searchingBooks})
+      })
+    }
   }
   componentDidMount() {
     BooksAPI.getAll().then(books =>{
@@ -34,13 +39,25 @@ class BooksApp extends React.Component {
             <div className="search-books-bar">
               <a className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</a>
               <div className="search-books-input-wrapper">
-                <input type="text" placeholder="Search by title or author" onChange={(e) => {this.setState({query:e.target.value})}}/>
+                <input type="text" placeholder="Search by title or author" onChange={this.bookQuery}/>
                 {JSON.stringify(this.state.query)}
               </div>
             </div>
             <div className="search-books-results">
               <ol className="books-grid">
-                {this.state.query ? }
+                {this.state.searchingBooks !== undefined && this.state.searchingBooks.map(book => (
+                  <li key={book.id}>
+                    <div className="book">
+                    <div className="book-top">
+                      <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail })`}}></div>
+                      <Select book={book} isFresh = {this.isFresh}/>
+                      </div>
+                    <div className="book-title">{book.title}</div>
+                    <div className="book-authors">{book.authors}</div>
+                  </div>
+                  </li>
+                ))
+              }
               </ol>
             </div>
           </div>
