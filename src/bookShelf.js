@@ -1,12 +1,6 @@
 import React,{Component}from 'react'
-import * as BooksAPI from './BooksAPI'
-import {Route} from 'react-router-dom'
 import Select from './select'
 class BookShelf extends Component {
-//Want to Read/Read
-  state = {
-    book_title:'',
-  }
 
   isFresh = () => {
     this.props.freshBooks()
@@ -23,7 +17,7 @@ class BookShelf extends Component {
                   <div className="book">
                     <div className="book-top">
                       <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail })`}}></div>
-                      <Select book={book} isFresh = {this.isFresh}/>
+                      <Select book={book} isFresh={this.isFresh}/>
                       </div>
                     <div className="book-title">{book.title}</div>
                     <div className="book-authors">{book.authors}</div>
