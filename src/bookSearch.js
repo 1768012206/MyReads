@@ -1,6 +1,7 @@
 import React,{Component} from 'react'
 import * as BooksAPI from "./BooksAPI";
 import Select from './select'
+import {Link} from "react-router-dom"
 class bookSearch extends Component{
   state = {
     searchingBooks:[],
@@ -23,15 +24,14 @@ class bookSearch extends Component{
     return(
       <div className="search-books">
         <div className="search-books-bar">
-          <a className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</a>
+          <Link to="/" className="close-search">Close</Link>
           <div className="search-books-input-wrapper">
             <input type="text" placeholder="Search by title or author" onChange={this.bookQuery}/>
-            {JSON.stringify(this.state.query)}
           </div>
         </div>
         <div className="search-books-results">
           <ol className="books-grid">
-            {this.state.searchingBooks !== undefined && this.state.searchingBooks.map((book)=>(
+            {this.state.searchingBooks !== undefined && this.state.searchingBooks instanceof Array && this.state.searchingBooks.map((book)=>(
               <li key={book.id}>
                 <div className="book">
                   <div className="book-top">
