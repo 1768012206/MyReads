@@ -2,7 +2,7 @@ import React,{Component} from 'react'
 import * as BooksAPI from "./BooksAPI";
 import BookShelf from './BookShelf'
 import {Link} from "react-router-dom"
-import { Throttle } from 'react-throttle';
+import { Debounce  } from 'react-throttle';
 import escapeRegExp from 'escape-string-regexp';
 class BookSearch extends Component{
   state = {
@@ -54,9 +54,9 @@ class BookSearch extends Component{
         <div className="search-books-bar">
           <Link to="/" className="close-search">Close</Link>
           <div className="search-books-input-wrapper">
-            <Throttle time="200" handler="onChange">
+            <Debounce time="400" handler="onChange">
             <input type="text" placeholder="Search by title or author" onChange={this.bookQuery}/>
-            </Throttle>
+            </Debounce>
           </div>
         </div>
         <div className="search-books-results">
