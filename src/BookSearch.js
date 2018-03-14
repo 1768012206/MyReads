@@ -1,8 +1,8 @@
 import React,{Component} from 'react'
 import * as BooksAPI from "./BooksAPI";
-import BookShelf from './BookShelf'
+import Book from './Book'
 import {Link} from "react-router-dom"
-import { Debounce  } from 'react-throttle';
+import { Debounce } from 'react-throttle';
 import escapeRegExp from 'escape-string-regexp';
 class BookSearch extends Component{
   state = {
@@ -12,17 +12,33 @@ class BookSearch extends Component{
   }
 
   searchingBooks = {}
-  isFresh = () =>{
-    BooksAPI.search(this.state.query).then(searchingBooks => {
-      this.setState({searchingBooks})
-    })
-  }
   bookQuery = (e) => {
     const match = new RegExp(escapeRegExp(e.target.value),'i')
     if(match.test(e.target.value)) {
       this.setState({query:e.target.value})
       BooksAPI.search(e.target.value).then(searchingBooks => {
-        this.setState({searchingBooks})
+        if(Array.isArray(searchingBooks)) {
+          this.searchingBooks = searchingBooks
+          if (this.searchingBooks !== undefined && this.searchingBooks instanceof Array) {
+            for(const searchingBook of this.searchingBooks){
+              let flag = 0
+              for(const book of this.state.books){
+                if (searchingBook.id === book.id) {
+                  searchingBook.shelf = book.shelf
+                  flag = 1
+                }
+              }
+              if(flag === 0){
+                searchingBook.shelf = 'none'
+              }
+            }
+            this.setState({
+              searchingBooks:this.searchingBooks
+            })
+          }
+        }else {
+          this.setState({searchingBooks:[]})
+        }
       })
     }
   }
@@ -31,24 +47,10 @@ class BookSearch extends Component{
     BooksAPI.getAll().then(books =>{
       this.setState({books})
     })
-  }
-
-  render() {
     this.searchingBooks = this.state.searchingBooks
-    if (this.searchingBooks !== undefined && this.searchingBooks instanceof Array) {
-      for(const searchingBook of this.searchingBooks){
-        let flag = 0
-        for(const book of this.state.books){
-          if (searchingBook.id === book.id) {
-            searchingBook.shelf = book.shelf
-            flag = 1
-          }
-        }
-        if(flag === 0){
-          searchingBook.shelf = 'new'
-        }
-      }
-    }
+  }
+  render() {
+
     return(
       <div className="search-books">
         <div className="search-books-bar">
@@ -61,14 +63,9 @@ class BookSearch extends Component{
         </div>
         <div className="search-books-results">
           <ol className="books-grid">
-            <div className="list-books-content">
-              <div>
-                <BookShelf books={this.searchingBooks} distinc="currentlyReading" freshBooks={this.freshBooks}/>
-                <BookShelf books={this.searchingBooks} distinc="wantToRead" freshBooks={this.freshBooks}/>
-                <BookShelf books={this.searchingBooks} distinc="read" freshBooks={this.freshBooks}/>
-                <BookShelf books={this.searchingBooks} distinc="new" freshBooks={this.freshBooks}/>
-              </div>
-            </div>
+            {this.state.searchingBooks.map(searchingBook => (
+              <Book key={searchingBook.id} book={searchingBook} updateBookInfo={this.props.updateBookInfo} />
+            ))}
           </ol>
         </div>
       </div>)
